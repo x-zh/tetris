@@ -1,0 +1,28 @@
+.block {
+    display: inline-block;
+    height: 24px;
+    width: 24px;
+    background: #ecf0f1;
+    border-right: 1px solid #95a5a6;
+    border-bottom: 1px solid #95a5a6;
+}
+#board, #menu {
+    float: left;
+    margin: 10px;
+}
+#board, #next_block{
+    border-top: 1px solid #95a5a6;
+    border-left: 1px solid #95a5a6;
+}
+#score, #lines {
+    margin-top: 10px;
+    clear: left;
+    text-align: center;
+}
+.form {
+    width: 96px;
+}
+.form .btn {
+    margin-top: 10px;
+    width: 100%;
+}
