@@ -63,7 +63,7 @@ $(function(){
                 cleared += 1;
             }
         }
-        score += Math.round(Math.pow(3, cleared - 1));
+        score += Math.round((1000 / parseInt(config.interval)) * Math.round(Math.pow(3, cleared - 1)));
         lines += cleared
         $('#score span').text(score);
         $('#lines span').text(lines);
