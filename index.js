@@ -246,6 +246,8 @@ $(function(){
         genBlock();
         document.onkeydown = keyDown;
         config.interval = parseInt(diff);
+        clearInterval(window.timer);
+        window.timer = null;
         gameStatus = 'running';
     };
     window.pause = function(){
