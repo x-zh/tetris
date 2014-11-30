@@ -1,10 +1,24 @@
 <html>
 <head>
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="index.css">
     <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
     <script src="index.js"></script>
 </head>
 <body>
+<div id="board"></div>
+<div id="menu">
+    <div id="next_block"></div>
+    <p id="score">Score: <span>0</span></p>
+    <p id="lines">Lines: <span>0</span></p>
+    <form class="form">
+        <input class="form-control" name="name" id="id_name" placeholder="Name" />
+        <button class="btn btn-success" type="button" onclick="javascript:start(400);">Normal</button>
+        <button class="btn btn-primary" type="button" onclick="javascript:start(200);">Expert</button>
+        <button class="btn btn-danger" type="button" onclick="javascript:start(100);">Torment</button>
+        <button id="pauseBtn" class="btn btn-info" type="button" onclick="javascript:pause();">Pause</button>
+    </form>
+</div>
 </body>
 </html>
