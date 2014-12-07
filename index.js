@@ -8,13 +8,13 @@ $(function(){
     var initBoard = function(){
         // initial a board, store game data
         board = new Array(config.height);
-        for(var i=0;i<18;i++){     
-            board[i] = new Array(10);      
-        }     
-        for(var i=0;i<18;i++){      
-            for(var j=0; j<10; j++){      
-                board[i][j] = 0;      
-            }      
+        for(var i=0;i<18;i++){
+            board[i] = new Array(10);
+        }
+        for(var i=0;i<18;i++){
+            for(var j=0; j<10; j++){
+                board[i][j] = 0;
+            }
         }
     };
     var genBlock = function(){
@@ -28,7 +28,10 @@ $(function(){
         if (!currentBlock.inBoundary()) {
             // game ends here
             gameStatus = 'dead';
-            return 
+            $.post('apis.php', {username: $('#id_name').val(), score: score}, function(){
+                updateRanking();
+            });
+            return
         }
     };
     var showNext = function(){
@@ -42,7 +45,7 @@ $(function(){
     }
     var clearLine = function(lineNumber){
         // clear the `lineNumber` on the board, because it's full
-        // replace current line with its above, till top, then clear top 
+        // replace current line with its above, till top, then clear top
         for(var i=lineNumber; i>0; i--){
             for(var j=0; j<config.width; j++){
                 board[i][j] = board[i-1][j];
@@ -81,7 +84,7 @@ $(function(){
         }
     };
     var keyDown = function(){
-        // key bindings, arrow keys. 
+        // key bindings, arrow keys.
         if(gameStatus == 'pause' || gameStatus == 'dead') {
             return
         }
@@ -96,24 +99,24 @@ $(function(){
             // in the begining, need keyDown to trigger game-start
             window.timer = setInterval(function(){currentBlock.moveDown();}, config.interval);
         }
-        switch(event.keyCode){      
-            case 37:{     
-                currentBlock.moveLeft();     
-                break;      
-            }      
-            case 38:{     
-                currentBlock.rotate();      
-                break;      
-            }      
-            case 39:{      
-                currentBlock.moveRight();      
-                break;     
-            }      
-            case 40:{      
+        switch(event.keyCode){
+            case 37:{
+                currentBlock.moveLeft();
+                break;
+            }
+            case 38:{
+                currentBlock.rotate();
+                break;
+            }
+            case 39:{
+                currentBlock.moveRight();
+                break;
+            }
+            case 40:{
                 currentBlock.moveDown();
-                break;      
-            }      
-        }      
+                break;
+            }
+        }
     }
 
     var blockTypes = ['o', 'i', 'z', 's', 'j', 'l', 't'];
@@ -122,7 +125,7 @@ $(function(){
         'o': '#16a085',
         'i': '#27ae60',
         'z': '#2980b9',
-        's': '#8e44ad', 
+        's': '#8e44ad',
         'j': '#f39c12',
         'l': '#e67e22',
         't': '#e74c3c'
@@ -135,8 +138,8 @@ $(function(){
         'j': [[0, 4], [1, 4], [1, 5], [1, 6]],
         'l': [[0, 4], [1, 4], [2, 4], [2, 5]],
         't': [[0, 5], [1, 4], [1, 5], [1, 6]],
-    };  // initial position for different type of blocks 
-    
+    };  // initial position for different type of blocks
+
     // Block Class
     function Block(type){
         this.type = type;
@@ -144,7 +147,7 @@ $(function(){
         this.activeBlock = blocks[type];
 
         this._emptyBlock = function(){
-            // clear the painting on html DOM by reset it's background 
+            // clear the painting on html DOM by reset it's background
             for(var i=0; i<this.activeBlock.length; i++){
                 var x = parseInt(this.activeBlock[i][0] + this.offset[0]),
                     y = parseInt(this.activeBlock[i][1] + this.offset[1]);
@@ -181,7 +184,7 @@ $(function(){
                 // generate a new block, use nextBlock as currentBlock
                 genBlock();
                 // start auto moveDown
-                if(!window.timer && gameStatus == 'running') 
+                if(!window.timer && gameStatus == 'running')
                     window.timer = setInterval(function(){currentBlock.moveDown();}, config.interval);
             }
             // set timeout for tmp
@@ -227,7 +230,7 @@ $(function(){
             // rotate
             var afterRotate = [], tmp;
             for(var i=0; i<this.activeBlock.length; i++){
-                afterRotate.push([cx + cy - this.activeBlock[i][1], 
+                afterRotate.push([cx + cy - this.activeBlock[i][1],
                     cy - cx + this.activeBlock[i][0]]);
             }
             // temp to store activeBlock in case rollback is needed
@@ -257,6 +260,10 @@ $(function(){
 
     window.start = function(diff){
         // game control, parameter is the interval for auto moveDown
+        if($('#id_name').val() == ''){
+            alert("Please enter your name before you start your game");
+            return
+        }
         score = 0, lines = 0;
         initBoard();
         $('.block').css('background', '#ecf0f1');
@@ -296,12 +303,12 @@ $(function(){
             $board.append($row);
         }
     };
-    // run it in the beginning 
+    // run it in the beginning
     drawBoard();
 
     var drawNextBoard = function(){
         // draw next-block board by jQuery append divs
-        var $board = $('#next_block'); 
+        var $board = $('#next_block');
         for(var i = 0; i < 4; i++){
             $row = $('<div></div>').addClass('row-' + i);
             for(var j = 0; j < 4; j++){
@@ -312,6 +319,24 @@ $(function(){
             $board.append($row);
         }
     };
-    // run it in the beginning 
+    // run it in the beginning
     drawNextBoard();
+
+    var updateRanking = function(){
+        $.get('apis.php', function(data){
+            if(data && data.length > 0){
+                $('#leaderboard').html('<h1>Leader Board</h1><table><thead><tr><th width="100">Name</th><th width="100">Score</th><th width="100">Date</th></tr><thead><tbody></tbody></table>');
+                $.each(data, function(k, v){
+                    var $row = $('<tr></tr>');
+                    $row.append('<td>' + v.username + '</td>');
+                    $row.append('<td>' + v.score + '</td>');
+                    $row.append('<td>' + v.datetime + '</td>');
+                    $('#leaderboard table tbody').append($row)
+                });
+            } else {
+                $('#leaderboard').html('');
+            }
+        }, 'json');
+    };
+    updateRanking();
 });
